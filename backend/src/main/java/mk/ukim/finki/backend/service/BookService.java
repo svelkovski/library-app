@@ -7,15 +7,18 @@ import mk.ukim.finki.backend.model.dto.BookFilter;
 import mk.ukim.finki.backend.model.dto.CreateBook;
 import mk.ukim.finki.backend.model.dto.DisplayBook;
 import mk.ukim.finki.backend.model.dto.UpdateBook;
+import mk.ukim.finki.backend.event.BookRentedEvent;
 import mk.ukim.finki.backend.model.exception.AuthorNotFoundException;
 import mk.ukim.finki.backend.model.exception.BookNotFoundException;
 import mk.ukim.finki.backend.model.projections.BookDetails;
 import mk.ukim.finki.backend.repository.AuthorRepository;
 import mk.ukim.finki.backend.repository.BookRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
@@ -25,6 +28,7 @@ public class BookService {
 
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     private static final Set<String> ALLOWED_SORT_FIELDS = Set.of("name", "createdAt");
 
@@ -89,6 +93,7 @@ public class BookService {
         bookRepository.delete(book);
     }
 
+    @Transactional
     public DisplayBook rent(Long id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
@@ -96,6 +101,7 @@ public class BookService {
         if (book.getAvailableCopies() > 0) {
             book.setAvailableCopies(book.getAvailableCopies() - 1);
             bookRepository.save(book);
+            applicationEventPublisher.publishEvent(new BookRentedEvent(book.getId(), book.getName(), book.getAvailableCopies()));
         }
 
         return DisplayBook.from(book);
