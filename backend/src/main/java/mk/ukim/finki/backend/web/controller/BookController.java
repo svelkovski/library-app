@@ -8,6 +8,7 @@ import mk.ukim.finki.backend.model.dto.DisplayBook;
 import mk.ukim.finki.backend.model.dto.UpdateBook;
 import mk.ukim.finki.backend.model.enums.BookState;
 import mk.ukim.finki.backend.model.enums.Category;
+import mk.ukim.finki.backend.model.projections.BookDetails;
 import mk.ukim.finki.backend.service.BookService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,7 +41,7 @@ public class BookController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DisplayBook> getById(@PathVariable Long id) {
+    public ResponseEntity<BookDetails> getById(@PathVariable Long id) {
         return ResponseEntity.ok(bookService.getById(id));
     }
 

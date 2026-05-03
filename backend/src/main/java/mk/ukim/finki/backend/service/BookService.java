@@ -9,6 +9,7 @@ import mk.ukim.finki.backend.model.dto.DisplayBook;
 import mk.ukim.finki.backend.model.dto.UpdateBook;
 import mk.ukim.finki.backend.model.exception.AuthorNotFoundException;
 import mk.ukim.finki.backend.model.exception.BookNotFoundException;
+import mk.ukim.finki.backend.model.projections.BookDetails;
 import mk.ukim.finki.backend.repository.AuthorRepository;
 import mk.ukim.finki.backend.repository.BookRepository;
 import org.springframework.data.domain.Page;
@@ -76,9 +77,8 @@ public class BookService {
                 .map(DisplayBook::from);
     }
 
-    public DisplayBook getById(Long id) {
-        return bookRepository.findById(id)
-                .map(DisplayBook::from)
+    public BookDetails getById(Long id) {
+        return bookRepository.findBookDetailsById(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
     }
 
