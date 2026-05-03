@@ -2,15 +2,22 @@ package mk.ukim.finki.backend.web.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import mk.ukim.finki.backend.model.dto.BookFilter;
 import mk.ukim.finki.backend.model.dto.CreateBook;
 import mk.ukim.finki.backend.model.dto.DisplayBook;
 import mk.ukim.finki.backend.model.dto.UpdateBook;
+import mk.ukim.finki.backend.model.enums.BookState;
+import mk.ukim.finki.backend.model.enums.Category;
+import mk.ukim.finki.backend.model.projections.BookDetails;
 import mk.ukim.finki.backend.service.BookService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/books")
@@ -20,12 +27,21 @@ public class BookController {
     private final BookService bookService;
 
     @GetMapping
-    public ResponseEntity<List<DisplayBook>> getAll() {
-        return ResponseEntity.ok(bookService.getAll());
+    public ResponseEntity<Page<DisplayBook>> getAll(
+            @RequestParam(required = false) Category category,
+            @RequestParam(required = false) BookState state,
+            @RequestParam(required = false) Long authorId,
+            @RequestParam(required = false) Boolean availableOnly,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable) {
+
+        BookFilter filter = new BookFilter(category, state, authorId, availableOnly);
+
+        return ResponseEntity.ok(bookService.getAll(filter, pageable));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DisplayBook> getById(@PathVariable Long id) {
+    public ResponseEntity<BookDetails> getById(@PathVariable Long id) {
         return ResponseEntity.ok(bookService.getById(id));
     }
 
