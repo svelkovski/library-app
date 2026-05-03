@@ -9,9 +9,9 @@ import mk.ukim.finki.backend.model.exception.AuthorNotFoundException;
 import mk.ukim.finki.backend.model.exception.CountryNotFoundException;
 import mk.ukim.finki.backend.repository.AuthorRepository;
 import mk.ukim.finki.backend.repository.CountryRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -36,11 +36,9 @@ public class AuthorService {
         return DisplayAuthor.from(author);
     }
 
-    public List<DisplayAuthor> getAll() {
-        return authorRepository.findAll()
-                .stream()
-                .map(DisplayAuthor::from)
-                .toList();
+    public Page<DisplayAuthor> getAll(Pageable pageable) {
+        return authorRepository.findAll(pageable)
+                .map(DisplayAuthor::from);
     }
 
     public DisplayAuthor getById(Long id) {

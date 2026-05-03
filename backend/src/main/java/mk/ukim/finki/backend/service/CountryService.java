@@ -6,9 +6,9 @@ import mk.ukim.finki.backend.model.dto.CreateCountry;
 import mk.ukim.finki.backend.model.dto.DisplayCountry;
 import mk.ukim.finki.backend.model.exception.CountryNotFoundException;
 import mk.ukim.finki.backend.repository.CountryRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,11 +28,9 @@ public class CountryService {
         return DisplayCountry.from(country);
     }
 
-    public List<DisplayCountry> getAll() {
-        return countryRepository.findAll()
-                .stream()
-                .map(DisplayCountry::from)
-                .toList();
+    public Page<DisplayCountry> getAll(Pageable pageable) {
+        return countryRepository.findAll(pageable)
+                .map(DisplayCountry::from);
     }
 
     public void delete(Long id) {

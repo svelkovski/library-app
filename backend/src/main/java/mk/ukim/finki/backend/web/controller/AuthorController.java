@@ -5,11 +5,14 @@ import lombok.RequiredArgsConstructor;
 import mk.ukim.finki.backend.model.dto.CreateAuthor;
 import mk.ukim.finki.backend.model.dto.DisplayAuthor;
 import mk.ukim.finki.backend.service.AuthorService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/authors")
@@ -19,8 +22,11 @@ public class AuthorController {
     private final AuthorService authorService;
 
     @GetMapping
-    public ResponseEntity<List<DisplayAuthor>> getAll() {
-        return ResponseEntity.ok(authorService.getAll());
+    public ResponseEntity<Page<DisplayAuthor>> getAll(
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(authorService.getAll(pageable));
     }
 
     @GetMapping("/{id}")

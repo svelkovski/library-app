@@ -5,11 +5,14 @@ import lombok.RequiredArgsConstructor;
 import mk.ukim.finki.backend.model.dto.CreateCountry;
 import mk.ukim.finki.backend.model.dto.DisplayCountry;
 import mk.ukim.finki.backend.service.CountryService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/countries")
@@ -19,8 +22,11 @@ public class CountryController {
     private final CountryService countryService;
 
     @GetMapping
-    public ResponseEntity<List<DisplayCountry>> getAll() {
-        return ResponseEntity.ok(countryService.getAll());
+    public ResponseEntity<Page<DisplayCountry>> getAll(
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(countryService.getAll(pageable));
     }
 
     @PostMapping
